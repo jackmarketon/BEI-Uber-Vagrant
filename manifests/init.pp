@@ -62,27 +62,29 @@ class { 'php::pear':
 	require => Class['php'],
 }
 
-# install mongo db pecl extension
-class mongophpext {
-    package { "make": 
-        ensure => "installed"
-    }
+php::pecl::module{'mongo':
+	use_package => 'true',
+	notify => Class['apache'],
+}
 
-    exec { "pecl install mongo":
-        command => "pecl install mongo",
-        path => "/usr/bin/",
-        require => Package["make"],
-        unless => 'pecl info mongo'
-    }
-    
-    file { "/etc/php5/conf.d/mongo.ini":
-        content=> 'extension=mongo.so',
-        require => Exec["pecl install mongo"]
-    }   
+
+# install mongo db pecl extednsion
+#package { "make": 
+#    ensure => "installed"
+#}
+
+#exec { "sudo pecl install mongo":
+#    command => "pecl install mongo",
+#    require => Package["make", "php"],
+#    unless => 'pecl info mongo'
+#}
+
+file { "/etc/php5/conf.d/mongo.ini":
+    content=> 'extension=mongo.so',
+    notify => Class['apache'],
+    require=> Class['php'],
 }
 
 if !defined(Package['git-core']) {
 	package {'git-core': }
 }
-
-
